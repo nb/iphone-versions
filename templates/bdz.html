@@ -1,0 +1,144 @@
+$def with (stations, trains=None, i=None)
+$var title: Разписание на БДЖ
+$var webclip: bdz-webclip.png
+$ from_station, to_station = i.from_station, i.to_station
+$if from_station and to_station:
+	$ from_nbsp, to_nbsp = [s.replace(' ', '&nbsp;') for s in from_station, to_station]
+
+$def stations_select(kind):
+	$if kind == 'to':
+		$ initial_label = 'Крайна гара'
+		$ selected = to_station
+	$else:
+		$ initial_label = 'Начална гара'
+		$ selected = from_station
+	<select name="$(kind)_station" id="$(kind)_station">
+		<option value="">$initial_label</option>
+	$if stations['user']:
+		<optgroup label="Моите гари">
+		$for station in stations['user']:
+			$:option(station, None, selected)
+		</optgroup>
+	<optgroup label="Най-често търсени">	
+	$for station in stations['main']:
+		$:option(station, None, selected)
+	</optgroup>
+	<optgroup label="Още&hellip;">		
+	$for station in stations['other']:
+		$:option(station, None, selected)
+	</optgroup>
+	<optgroup label="И още&hellip;">
+		<option value="missing">Нова гара&hellip;</option>
+	</optgroup>
+	</select>
+	<div id="$(kind)_station_extra">
+		<p>
+			<label for="other_$(kind)_station">Нова гара: </label>
+			<input type="text" name="other_$(kind)_station" value="" id="other_$(kind)_station" />
+		</p>
+		<p>
+			<input type="button" name="add_$(kind)_station" value="Добавяне" id="add_$(kind)_station" disabled="disabled" />
+			<a href="#" id="cancel_$(kind)_station">Отказ</a>
+		</p>
+		<span class="lat-note"><strong>Съвет:</strong> може да напишете името на гарата и на латиница.</span>
+	</div>
+
+
+$if trains:
+	<div class="trains">
+	<em>От</em> <span class="destination">$:from_nbsp</span> <em>за</em> <span class="destination">$:to_nbsp</span>:
+	<table>
+		<tr>
+			<th>Тип</th>
+			<th>Тръгва</th>
+			<th>Пристига</th>
+			<th>Пътува</th>
+		</tr>
+	$for train in trains:
+		$if loop.odd: <tr class="odd">
+		$else: <tr>
+			<td>$train['kind']</td>
+			<td>$train['departure']</td>
+			<td>$train['arrival']</td>
+			<td>$train['duration'] ч.</td>			
+		</tr>
+	</table>
+	<p class="note">
+		Може и да <a href="tel:+35929311111">позвъните за информация</a> на Централна <acronym title="ЖелезоПътна">ЖП</acronym> гара.
+	</p>
+	</div>
+$elif from_station and to_station:
+	<div class="error">
+		<strong>Грешка:</strong><br />
+		Не беше намерен влак между <span class="destination">$:from_nbsp</span> и <span class="destination">$:to_nbsp</span>.
+		Може да <a href="tel:+35929311111">позвъните за информация</a> на Централна <acronym title="ЖелезоПътна">ЖП</acronym> гара.
+	</div>
+<form action="" method="post" id="train-search">
+<p>
+	<label for="from_station">От:</label>
+	$:stations_select('from')
+</p>
+<p>
+	<label for="to_station">За:</label>
+	$:stations_select('to')
+</p>
+<p>
+	<input type="submit" name="submit" value="Разписание &rarr;" id="submit" disabled="disabled"/>
+</p>
+</form>
+$if stations['user']:
+	<a class="meta" href="javascript:delete_user_stations()">
+		<img src="$url('images', 'delete.png')" alt="" style="vertical-align: -28%;" />
+		Изтриване на моите гари &mdash; ${', '.join(stations['user'])}
+	</a>
+<script type="text/javascript" charset="utf-8">
+	var i = function(i) { return document.getElementById(i); }
+	function setup_station_select_extra(kind) {
+		var sel = i(kind+'_station');
+		var other_sel = i((kind == 'to'? 'from' : 'to')+'_station');
+		var extra = i(kind+'_station_extra');
+		var select_is_valid = function(s) {
+			var v = s.options[s.selectedIndex].value;
+			return (v && v != 'missing');
+		}
+		var try_to_enable_submit = function() {
+			i('submit').disabled = !select_is_valid(sel) || !select_is_valid(other_sel);
+		}
+		try_to_enable_submit();
+		try_to_enable_submit();
+		sel.onchange = function(e) {
+			try_to_enable_submit();
+			if (sel.options[sel.selectedIndex].value == 'missing') {
+			extra.style.display = 'block';
+			i('add_'+kind+'_station').onclick = function(e) {
+				var o = document.createElement('option');
+				o.text = o.value = i('other_'+kind+'_station').value;
+				o.selected = true;
+				sel.options.add(o);
+				sel.selectedIndex = sel.options.length - 1;
+				try_to_enable_submit();
+				//set_cookie('user_stations', get_cookie('user_stations') + '|' + o.value);
+				extra.style.display = 'none';
+			}
+			i('other_'+kind+'_station').onkeyup  = function(e) {
+				i('add_'+kind+'_station').disabled = !Boolean(i('other_'+kind+'_station').value);
+			}
+			i('cancel_'+kind+'_station').onclick = function(e) {
+				extra.style.display = 'none';
+				sel.selectedIndex = 0;
+				return false;
+			}
+			i('other_'+kind+'_station').focus();
+		}}
+	}
+	
+	function delete_user_stations() {
+		if (confirm('Искате ли да премахнете от списъка вашите гари?')) {
+			set_cookie('user_stations', '');
+			window.location.reload();
+		}
+	}
+	
+	setup_station_select_extra('to');
+	setup_station_select_extra('from');
+</script>

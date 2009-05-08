@@ -1,0 +1,29 @@
+$def with (content)
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>$content.title</title>
+		<link rel="stylesheet" href="$:url('style', 'style.css')" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" charset="utf-8" src="$:url('js', 'common.js')"></script>
+		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
+		$if hasattr(content, 'webclip') and content.webclip:
+			<link rel="apple-touch-icon" href="$:url('images', content.webclip)"/>
+	</head>
+	<body>
+		<div id="header">
+			<h1>$content.title</h1>
+		</div>
+		<div class="colmask fullpage">
+			<div class="col1">
+				$:content
+			</div>
+		</div>
+		<div id="footer">
+			<p>
+				<a href="$url()">Начало</a>&nbsp;|&nbsp;<a href="$url('bdz')">БДЖ</a>&nbsp;|&nbsp;<a href="$url('about')" id="about">Относнo</a>
+			</p>
+		</div>
+	</body>
+</html>
