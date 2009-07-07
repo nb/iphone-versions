@@ -95,7 +95,16 @@ def canonical_station(station):
         cyr = cyr_to_lat_station(station)
     if cyr: return cyr
     return station
-
+    
+contact_places = [
+    ['Централна ЖП гара', 42.711898, 23.322446, '+35929311111'],
+    ['ЖП гара Горна Оряховица', 43.136193, 25.6917, '+35961856050'],
+    ['ЖП гара Варна', 43.228194, 27.92347, '+35952630414'],
+    ['ЖП гара Пловдив', 42.135026, 24.741935, '+35932622729'],
+    ['ЖП гара Русе', 43.838118, 25.956874, '+35982820222'],
+    ['ЖП гара Бургас', 42.495106,27.476056, '+35956845022'],    
+]
+contact_places = [{'title': unicode(place[0], 'utf-8'), 'latitude': place[1], 'longitude': place[2], 'phone': place[3]} for place in contact_places]
 
 main_stations = [
     'СОФИЯ',

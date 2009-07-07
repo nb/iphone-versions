@@ -1,4 +1,4 @@
-$def with (stations, trains=None, i=None)
+$def with (stations, trains=None, i=None, contact_places=None)
 $var title: Разписание на БДЖ
 $var webclip: bdz-webclip.png
 $ from_station, to_station = i.from_station, i.to_station
@@ -19,11 +19,11 @@ $def stations_select(kind):
 		$for station in stations['user']:
 			$:option(station, None, selected)
 		</optgroup>
-	<optgroup label="Най-често търсени">	
+	<optgroup label="Най-често търсени">
 	$for station in stations['main']:
 		$:option(station, None, selected)
 	</optgroup>
-	<optgroup label="Още&hellip;">		
+	<optgroup label="Още&hellip;">
 	$for station in stations['other']:
 		$:option(station, None, selected)
 	</optgroup>
@@ -64,14 +64,14 @@ $if trains:
 		</tr>
 	</table>
 	<p class="note">
-		Може и да <a href="tel:+35929311111">позвъните за информация</a> на Централна <acronym title="ЖелезоПътна">ЖП</acronym> гара.
+		Може и да <a href="tel:+35929311111" id="call-number">позвъните за информация</a> на <span id="call-place">Централна <acronym title="ЖелезоПътна">ЖП</acronym> гара</span>.
 	</p>
 	</div>
 $elif from_station and to_station:
 	<div class="error">
 		<strong>Грешка:</strong><br />
 		Не беше намерен влак между <span class="destination">$:from_nbsp</span> и <span class="destination">$:to_nbsp</span>.
-		Може да <a href="tel:+35929311111">позвъните за информация</a> на Централна <acronym title="ЖелезоПътна">ЖП</acronym> гара.
+		Може да <a href="tel:+35929311111" id="call-number">позвъните за информация</a> на <span id="call-place">Централна <acronym title="ЖелезоПътна">ЖП</acronym> гара</a>.
 	</div>
 <form action="" method="post" id="train-search">
 <p>
@@ -92,6 +92,7 @@ $if stations['user']:
 		Изтриване на моите гари &mdash; ${', '.join(stations['user'])}
 	</a>
 <script type="text/javascript" charset="utf-8">
+// <![CDATA[
 	var i = function(i) { return document.getElementById(i); }
 	function setup_station_select_extra(kind) {
 		var sel = i(kind+'_station');
@@ -139,6 +140,31 @@ $if stations['user']:
 		}
 	}
 	
+	function update_contact_place() {
+		var contact_places = $:json.write(bdz.contact_places);
+		function on_location(position) {
+			var best_place_index = 0;
+			var best_distance = 100;
+			for(j = 0; j < contact_places.length; ++j) {
+				var d = distance(contact_places[j], position);
+				if ( d < best_distance) {
+					best_distance = d;
+					best_place_index = j;
+				}
+			}
+			if (0 != best_place_index) {
+				var best_place = contact_places[best_place_index];
+				i('call-number').href='tel:' + best_place.phone;
+				i('call-place').innerHTML = best_place.title;
+			}
+		}
+		if (i('call-number') && navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(on_location);
+		}
+	}
+	
 	setup_station_select_extra('to');
 	setup_station_select_extra('from');
+	update_contact_place();
+// ]]>
 </script>

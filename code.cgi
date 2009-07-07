@@ -4,12 +4,15 @@ import web
 import sys
 import bdz
 import utils
+import json
 
 template_globals = {
     'url': utils.url,
     'web': web,
     'option': utils.option,
     'hasattr': hasattr,
+    'json': json,
+    'bdz': bdz,
 }
 
 render = web.template.render('templates/', base='layout', globals=template_globals)
@@ -31,7 +34,7 @@ class BDZ:
         trains = bdz.trains(i.from_station, i.to_station)
         if trains:
             bdz.add_to_user_stations(i.from_station, i.to_station)
-        return render.bdz(bdz.stations(), trains, i=i)
+        return render.bdz(bdz.stations(), trains, i=i, contact_places=bdz.contact_places)
 
 urls = (
     '/', static('index'),
