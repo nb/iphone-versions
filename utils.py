@@ -2,14 +2,23 @@
 import web
 import string
 import os.path
+from config import config
 
 cyrillic_letters = "абвгдежзийклмнопртуфхцшщъьюя"
 
 def url(*args):
     """Returns the an URL made from the home with all parts in *args added as path components"""
-    home = web.ctx.home.replace('/code.cgi', '')
-    return os.path.join(*([home] + list(args)))
+    return os.path.join(*([config.home] + list(args)))
     
+def js_url(*args):
+    return url(*(['static', 'js'] + list(args)))
+
+def style_url(*args):
+    return url(*(['static', 'style'] + list(args)))
+
+def images_url(*args):
+    return url(*(['static', 'images'] + list(args)))
+
 def option(label, value=None, selected=None):
     """Returns HTML code for an option tag"""
     if value is None: value = label

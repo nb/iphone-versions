@@ -8,6 +8,9 @@ import json
 
 template_globals = {
     'url': utils.url,
+    'images_url': utils.images_url,
+    'style_url': utils.style_url,
+    'js_url': utils.js_url,
     'web': web,
     'option': utils.option,
     'hasattr': hasattr,

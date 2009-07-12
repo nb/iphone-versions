@@ -5,11 +5,11 @@ $def with (content)
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>$content.title</title>
-		<link rel="stylesheet" href="$:url('style', 'style.css')" type="text/css" media="screen" charset="utf-8" />
-		<script type="text/javascript" charset="utf-8" src="$:url('js', 'common.js')"></script>
+		<link rel="stylesheet" href="$:style_url('style.css')" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" charset="utf-8" src="$:js_url('common.js')"></script>
 		<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
 		$if hasattr(content, 'webclip') and content.webclip:
-			<link rel="apple-touch-icon" href="$:url('images', content.webclip)"/>
+			<link rel="apple-touch-icon" href="$:images_url(content.webclip)"/>
 	</head>
 	<body>
 		<div id="header">
