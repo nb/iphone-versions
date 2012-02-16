@@ -11,7 +11,7 @@ class Production(Environment):
     def home(self):
         return web.ctx.home.replace('/code.cgi', '')
         
-# TODO: choose environment
+# TODO: choose environment dynamically
 environment = 'Production'
 
 config = globals()[environment]()
